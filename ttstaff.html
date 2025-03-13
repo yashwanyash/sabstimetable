@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Timetable</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 20px;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>College Timetable - <span id="current-day"></span></h2>
+    <table id="timetable">
+        <thead>
+            <tr id="table-header"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
+            document.getElementById("current-day").textContent = currentDay; // Display current day
+
+            fetch("http://localhost:5004/api/timetable/today") // Fetch today's timetable
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.body.innerHTML += "<p>No timetable available for today.</p>";
+                        return;
+                    }
+
+                    const tableHeader = document.getElementById("table-header");
+                    const tableBody = document.getElementById("table-body");
+
+                    tableHeader.innerHTML = ""; // Clear headers
+                    tableBody.innerHTML = ""; // Clear table body
+
+                    let columns = Object.keys(data[0]); // Get column names
+
+                    // Create table headers
+                    columns.forEach(col => {
+                        const th = document.createElement("th");
+                        th.textContent = col.replace(/_/g, " "); // Format column names
+                        tableHeader.appendChild(th);
+                    });
+
+                    // Insert data into the table
+                    data.forEach(row => {
+                        const tr = document.createElement("tr");
+                        columns.forEach(col => {
+                            const td = document.createElement("td");
+                            td.textContent = row[col];
+                            tr.appendChild(td);
+                        });
+                        tableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error("❌ Error fetching data:", error));
+        });
+    </script>
+    <h2>Staff Suggestions</h2>
+    <input type="text" id="staff_name" placeholder="Enter Your Name" required>
+    <br>
+    <textarea id="suggestion" placeholder="Write your suggestion..."></textarea>
+    <br>
+    <button onclick="submitSuggestion()">Submit</button>
+
+    <script>
+        function submitSuggestion() {
+            const staffName = document.getElementById("staff_name").value;
+            const message = document.getElementById("suggestion").value;
+
+            if (!staffName || !message) {
+                alert("Both name and suggestion are required!");
+                return;
+            }
+
+            fetch("http://localhost:5004/api/suggestions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ staff_name: staffName, message })
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.message);
+                document.getElementById("suggestion").value = "";
+            })
+            .catch(error => console.error("❌ Error submitting suggestion:", error));
+        }
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Timetable</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 20px;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        .btn {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .edit-btn { background: #f39c12; color: white; }
+        .save-btn { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+
+    <h2>College Timetable - <span id="current-day"></span></h2>
+    <table id="timetable">
+        <thead>
+            <tr id="table-header"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+
+    <button id="editButton" class="btn edit-btn">Edit</button>
+    <button id="saveButton" class="btn save-btn" disabled>Save</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
+            document.getElementById("current-day").textContent = currentDay; // Display current day
+
+            fetch("http://localhost:5004/api/timetable/today") // Fetch today's timetable
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.body.innerHTML += "<p>No timetable available for today.</p>";
+                        return;
+                    }
+
+                    const tableHeader = document.getElementById("table-header");
+                    const tableBody = document.getElementById("table-body");
+
+                    tableHeader.innerHTML = ""; // Clear headers
+                    tableBody.innerHTML = ""; // Clear table body
+
+                    let columns = Object.keys(data[0]); // Get column names
+
+                    // Create table headers
+                    columns.forEach(col => {
+                        const th = document.createElement("th");
+                        th.textContent = col.replace(/_/g, " "); // Format column names
+                        tableHeader.appendChild(th);
+                    });
+
+                    // Insert data into the table
+                    data.forEach(row => {
+                        const tr = document.createElement("tr");
+                        columns.forEach(col => {
+                            const td = document.createElement("td");
+                            td.textContent = row[col];
+                            td.setAttribute("contenteditable", "false"); // Initially not editable
+                            tr.appendChild(td);
+                        });
+                        tableBody.appendChild(tr);
+                    });
+
+                    // Enable editing mode
+                    document.getElementById("editButton").addEventListener("click", () => {
+                        document.querySelectorAll("#table-body td").forEach(td => {
+                            td.setAttribute("contenteditable", "true");
+                        });
+                        document.getElementById("saveButton").disabled = false;
+                        document.getElementById("editButton").disabled = true;
+                    });
+
+                    // Save edited data
+                    document.getElementById("saveButton").addEventListener("click", () => {
+                        let updatedData = [];
+                        document.querySelectorAll("#table-body tr").forEach(row => {
+                            let rowData = {};
+                            let cells = row.querySelectorAll("td");
+
+                            cells.forEach((cell, index) => {
+                                rowData[columns[index]] = cell.textContent.trim();
+                            });
+
+                            updatedData.push(rowData);
+                        });
+
+                        console.log("🔍 Sending Data:", JSON.stringify(updatedData, null, 2)); // Debug
+                        
+                        // Send updated data to the server
+                        fetch("http://localhost:5004/api/timetable", {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(updatedData)
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            alert(result.message);
+                            document.getElementById("saveButton").disabled = true;
+                            document.getElementById("editButton").disabled = false;
+                            document.querySelectorAll("#table-body td").forEach(td => {
+                                td.setAttribute("contenteditable", "false");
+                            });
+                        })
+                        .catch(error => console.error("Error updating timetable:", error));
+                    });
+                })
+                .catch(error => console.error("❌ Error fetching data:", error));
+        });
+    </script>
+    <h2>Admin - Staff Suggestions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Staff Name</th>
+                <th>Suggestion</th>
+            </tr>
+        </thead>
+        <tbody id="suggestions-table"></tbody>
+    </table>
+
+    <script>
+        function fetchSuggestions() {
+            fetch("http://localhost:5004/api/suggestions")
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById("suggestions-table");
+                    table.innerHTML = "";
+                    data.forEach(suggestion => {
+                        table.innerHTML += `<tr><td>${suggestion.staff_name}</td><td>${suggestion.message}</td></tr>`;
+                    });
+                })
+                .catch(error => console.error("❌ Error fetching suggestions:", error));
+        }
+
+        fetchSuggestions();
+        setInterval(fetchSuggestions, 10000); // Refresh every 10 seconds
+    </script>
+
+</body>
+</html>
