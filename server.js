@@ -5,6 +5,7 @@ const mysql = require("mysql2");
 const app = express();
 const PORT = 5004;
 
+
 app.use(cors());
 app.use(express.json()); // Allows Express to handle JSON requests
 
@@ -23,6 +24,50 @@ db.connect(err => {
         console.log("✅ Connected to MySQL");
     }
 });
+
+app.post("/api/staff-login", (req, res) => {
+    const { passcode } = req.body;
+
+    const sql = "SELECT * FROM staff WHERE passcode = ?";
+    db.query(sql, [passcode], (err, results) => {
+        if (err) {
+            console.error("❌ Database error:", err);
+            return res.status(500).json({ error: "Database query failed" });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true });
+        } else {
+            res.json({ success: false });
+        }
+    });
+});
+
+
+app.post("/api/admin-login", (req, res) => {
+    const { passcode } = req.body;
+
+    if (!passcode) {
+        return res.status(400).json({ error: "Passcode is required" });
+    }
+
+    const sql = "SELECT * FROM admin WHERE passcode = ?";
+    db.query(sql, [passcode], (err, results) => {
+        if (err) {
+            console.error("❌ Database error:", err);
+            res.status(500).json({ error: "Database query failed" });
+            return;
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true });
+        } else {
+            res.json({ success: false });
+        }
+    });
+});
+
+
 
 // **Function to Clear Old Suggestions at Midnight**
 function clearOldSuggestions() {
