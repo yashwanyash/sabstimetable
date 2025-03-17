@@ -48,7 +48,7 @@
             const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
             document.getElementById("current-day").textContent = currentDay;
 
-            fetch(`http://localhost:5004/api/timetable/course/${courseName}`)
+            fetch(`https://sabstimetable.onrender.com/api/timetable/course/${courseName}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.length === 0) {
