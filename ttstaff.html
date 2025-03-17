@@ -44,8 +44,8 @@
             const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
             document.getElementById("current-day").textContent = currentDay; // Display current day
 
-            fetch("https://yourapp.onrender.com/api/timetable/today")
- // Fetch today's timetable
+            fetch("https://sabstimetable.onrender.com/api/timetable/today")
+            // Fetch today's timetable
                 .then(response => response.json())
                 .then(data => {
                     if (data.length === 0) {
