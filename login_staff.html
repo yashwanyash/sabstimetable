@@ -102,32 +102,34 @@
         </form>
         <p id="error-message">Invalid passcode. Please try again.</p>
     </div>
-<script>
-    document.getElementById("staff-login-form").addEventListener("submit", function (e) {
-        e.preventDefault();
-    
-        const passcode = document.getElementById("passcode").value;
-    
-        fetch("https://sabstimetable.onrender.com/api/staff-login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ passcode })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = "ttstaff.html"; // Redirect to staff page
-            } else {
+    <script>
+        document.getElementById("staff-login-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+        
+            const passcode = document.getElementById("passcode").value;
+        
+            fetch("https://sabstimetable.onrender.com/api/staff-login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ passcode })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem("staff_logged_in", "true"); // ✅ Store login session
+                    window.location.href = "ttstaff.html"; // ✅ Redirect on success
+                } else {
+                    document.getElementById("error-message").style.display = "block"; // Show error
+                }
+            })
+            .catch(error => {
+                console.error("❌ Error:", error);
+                document.getElementById("error-message").textContent = "Server error. Please try again.";
                 document.getElementById("error-message").style.display = "block";
-            }
-        })
-        .catch(error => {
-            console.error("❌ Error:", error);
-            document.getElementById("error-message").textContent = "Server error. Please try again.";
-            document.getElementById("error-message").style.display = "block";
+            });
         });
-    });
-    
     </script>
+    
+    
 </body>
 </html>

@@ -40,6 +40,13 @@
     </table>
 
     <script>
+        
+            if (!localStorage.getItem("staff_logged_in")) {
+                window.location.href = "login_staff.html"; // Redirect to login if not logged in
+            }
+    
+        
+        
         document.addEventListener("DOMContentLoaded", function () {
             const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
             document.getElementById("current-day").textContent = currentDay; // Display current day

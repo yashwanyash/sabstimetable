@@ -148,8 +148,15 @@
         </thead>
         <tbody id="suggestions-table"></tbody>
     </table>
-
+    
     <script>
+        
+            if (!localStorage.getItem("admin_logged_in")) {
+                window.location.href = "login_admin.html"; // Redirect to login if not logged in
+            }
+        
+           
+        
         function fetchSuggestions() {
             fetch("https://sabstimetable.onrender.com/api/suggestions")
                 .then(response => response.json())

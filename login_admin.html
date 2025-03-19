@@ -113,17 +113,13 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ passcode })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = "ttadmin.html"; // Redirect to admin page
+                    localStorage.setItem("admin_logged_in", "true"); // ✅ Store login session
+                    window.location.href = "ttadmin.html"; // ✅ Redirect on success
                 } else {
-                    document.getElementById("error-message").style.display = "block";
+                    document.getElementById("error-message").style.display = "block"; // Show error
                 }
             })
             .catch(error => {
@@ -132,7 +128,9 @@
                 document.getElementById("error-message").style.display = "block";
             });
         });
-        
     </script>
+    
+    
+    
 </body>
 </html>
