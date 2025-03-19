@@ -11,26 +11,52 @@
             background-color: #f4f4f4;
             margin: 20px;
         }
-        table {
-            width: 60%;
-            margin: 20px auto;
-            border-collapse: collapse;
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* Enables horizontal scrolling on small screens */
         }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
         th, td {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
             text-align: center;
+            font-size: 16px;
         }
+
         th {
             background-color: #007BFF;
             color: white;
         }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
     </style>
 </head>
 <body>
-
+    <div class="container">
     <h2>III BBA Timetable - <span id="current-day"></span></h2>
     <table id="timetable">
         <thead>
@@ -41,7 +67,7 @@
         </thead>
         <tbody id="table-body"></tbody>
     </table>
-
+</div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const courseName = "III BBA".replace(/ /g, "-"); // Convert to URL-friendly format
@@ -79,8 +105,9 @@
 
                         // Subject Column
                         const tdSubject = document.createElement("td");
-                        tdSubject.textContent = data[0][slot]; // Get subject from JSON data
+                        tdSubject.textContent = data[0][slot] || "N/A"; // If no subject, show "N/A"
                         tr.appendChild(tdSubject);
+
 
                         tableBody.appendChild(tr);
                     });
