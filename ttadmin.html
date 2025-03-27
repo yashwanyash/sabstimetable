@@ -42,6 +42,8 @@
 <body>
 
     <h2>College Timetable - <span id="current-day"></span></h2>
+    
+    
     <table id="timetable">
         <thead>
             <tr id="table-header"></tr>
@@ -53,6 +55,7 @@
     <button id="saveButton" class="btn save-btn" disabled>Save</button>
 
     <script>
+
         document.addEventListener("DOMContentLoaded", function () {
             const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
             document.getElementById("current-day").textContent = currentDay; // Display current day

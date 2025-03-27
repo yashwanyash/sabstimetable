@@ -168,6 +168,8 @@ app.get("/api/timetable/today", (req, res) => {
     });
 });
 
+
+
 // **Update Timetable Data**
 app.put("/api/timetable", (req, res) => {
     console.log("📩 Received Data:", JSON.stringify(req.body, null, 2)); // Debug
@@ -193,6 +195,9 @@ app.put("/api/timetable", (req, res) => {
 
     res.json({ message: "✅ Timetable updated successfully!" });
 });
+
+
+
 
 // **Fetch timetable for a specific course**
 app.get("/api/timetable/course/:courseName", (req, res) => {
