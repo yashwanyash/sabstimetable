@@ -156,7 +156,7 @@ app.get("/api/suggestions", (req, res) => {
 app.get("/api/timetable/today", (req, res) => {
     const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
 
-    const sql = "SELECT * FROM timetable_days WHERE day = ?";
+    const sql = "SELECT * FROM daily_timetable WHERE day = ?";
 
     db.query(sql, [currentDay], (err, results) => {
         if (err) {
@@ -181,7 +181,7 @@ app.put("/api/timetable", (req, res) => {
         const columnNames = Object.keys(columns);
         const columnValues = Object.values(columns);
 
-        let query = `UPDATE timetable_days SET ${columnNames.map(col => `${col} = ?`).join(", ")} WHERE id = ?`;
+        let query = `UPDATE daily_timetable SET ${columnNames.map(col => `${col} = ?`).join(", ")} WHERE id = ?`;
         let values = [...columnValues, id];
 
         db.query(query, values, (err, result) => {
@@ -204,7 +204,7 @@ app.get("/api/timetable/course/:courseName", (req, res) => {
     const courseName = req.params.courseName.replace(/-/g, " "); // Convert URL format to database format
     const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
 
-    const sql = "SELECT * FROM timetable_days WHERE course = ? AND day = ?";
+    const sql = "SELECT * FROM daily_timetable WHERE course = ? AND day = ?";
 
     db.query(sql, [courseName, currentDay], (err, results) => {
         if (err) {
