@@ -182,8 +182,8 @@ function resetDailyTimetable() {
 
         // Step 2: Copy data from master_timetable
         const sql = `
-            INSERT INTO daily_timetable (course, year, section, day, period, subject, faculty)
-            SELECT course, year, section, day, period, subject, faculty FROM master_timetable
+             INSERT INTO daily_timetable (course, day, 8_9_AM, 9_10_AM, 10_11_AM, 11_30_12_30_PM, 12_30_1_30_PM, 1_30_2_30_PM)
+             SELECT course, day, 8_9_AM, 9_10_AM, 10_11_AM, 11_30_12_30_PM, 12_30_1_30_PM, 1_30_2_30_PM FROM master_timetable
         `;
 
         db.query(sql, (err, result) => {
