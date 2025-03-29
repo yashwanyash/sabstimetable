@@ -168,6 +168,44 @@ app.get("/api/timetable/today", (req, res) => {
     });
 });
 
+// Function to reset daily_timetable from master_timetable
+function resetDailyTimetable() {
+    console.log("🔄 Resetting daily timetable from master timetable...");
+
+    // Step 1: Clear daily_timetable
+    db.query("DELETE FROM daily_timetable", (err, result) => {
+        if (err) {
+            console.error("❌ Error clearing daily_timetable:", err);
+            return;
+        }
+        console.log("✅ daily_timetable cleared!");
+
+        // Step 2: Copy data from master_timetable
+        const sql = `
+            INSERT INTO daily_timetable (course, year, section, day, period, subject, faculty)
+            SELECT course, year, section, day, period, subject, faculty FROM master_timetable
+        `;
+
+        db.query(sql, (err, result) => {
+            if (err) {
+                console.error("❌ Error copying from master_timetable:", err);
+            } else {
+                console.log("✅ daily_timetable reset from master_timetable!");
+            }
+        });
+    });
+}
+
+// Run resetDailyTimetable once on server start
+resetDailyTimetable();
+
+// Schedule resetDailyTimetable to run at midnight every day
+setInterval(() => {
+    const now = new Date();
+    if (now.getHours() === 0 && now.getMinutes() === 0) {
+        resetDailyTimetable();
+    }
+}, 60000); // Check every minute
 
 
 // **Update Timetable Data**
