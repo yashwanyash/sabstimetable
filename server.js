@@ -168,44 +168,69 @@ app.get("/api/timetable/today", (req, res) => {
     });
 });
 
-// Function to reset daily_timetable from master_timetable
+// ✅ Function to reset daily_timetable from master_timetable
 function resetDailyTimetable() {
-    console.log("🔄 Resetting daily timetable from master timetable...");
+    const today = new Date().toISOString().split("T")[0];
 
-    // Step 1: Clear daily_timetable
-    db.query("DELETE FROM daily_timetable", (err, result) => {
+    console.log("🔄 Checking if daily timetable needs reset...");
+
+    // Step 0: Check if we already reset today
+    db.query("SELECT value FROM system_settings WHERE name = 'last_timetable_reset'", (err, result) => {
         if (err) {
-            console.error("❌ Error clearing daily_timetable:", err);
+            console.error("❌ Error checking last_timetable_reset:", err);
             return;
         }
-        console.log("✅ daily_timetable cleared!");
 
-        // Step 2: Copy data from master_timetable
-        const sql = `
-             INSERT INTO daily_timetable (course, day, 8_9_AM, 9_10_AM, 10_11_AM, 11_30_12_30_PM, 12_30_1_30_PM, 1_30_2_30_PM)
-             SELECT course, day, 8_9_AM, 9_10_AM, 10_11_AM, 11_30_12_30_PM, 12_30_1_30_PM, 1_30_2_30_PM FROM master_timetable
-        `;
+        const lastReset = result.length > 0 ? result[0].value : null;
 
-        db.query(sql, (err, result) => {
+        if (lastReset === today) {
+            console.log("✅ Already reset today. Skipping...");
+            return;
+        }
+
+        // Step 1: Clear daily_timetable
+        db.query("DELETE FROM daily_timetable", (err) => {
             if (err) {
-                console.error("❌ Error copying from master_timetable:", err);
-            } else {
-                console.log("✅ daily_timetable reset from master_timetable!");
+                console.error("❌ Error clearing daily_timetable:", err);
+                return;
             }
+            console.log("✅ daily_timetable cleared!");
+
+            // Step 2: Copy data from master_timetable
+            const copySql = `
+                INSERT INTO daily_timetable (course, day, 8_9_AM, 9_10_AM, 10_11_AM, 11_30_12_30_PM, 12_30_1_30_PM, 1_30_2_30_PM)
+                SELECT course, day, 8_9_AM, 9_10_AM, 10_11_AM, 11_30_12_30_PM, 12_30_1_30_PM, 1_30_2_30_PM FROM master_timetable
+            `;
+
+            db.query(copySql, (err) => {
+                if (err) {
+                    console.error("❌ Error copying from master_timetable:", err);
+                } else {
+                    console.log("✅ Copied from master_timetable!");
+
+                    // Step 3: Update the reset flag
+                    db.query(`
+                        INSERT INTO system_settings (name, value)
+                        VALUES ('last_timetable_reset', ?)
+                        ON DUPLICATE KEY UPDATE value = ?
+                    `, [today, today], (err) => {
+                        if (err) {
+                            console.error("❌ Failed to update last_timetable_reset:", err);
+                        } else {
+                            console.log("📅 Updated last_timetable_reset to", today);
+                        }
+                    });
+                }
+            });
         });
     });
 }
 
-// Run resetDailyTimetable once on server start
+// ✅ Run reset once on server start
 resetDailyTimetable();
 
-// Schedule resetDailyTimetable to run at midnight every day
-setInterval(() => {
-    const now = new Date();
-    if (now.getHours() === 0 && now.getMinutes() === 0) {
-        resetDailyTimetable();
-    }
-}, 60000); // Check every minute
+// ✅ Check every minute (only resets once per day)
+setInterval(resetDailyTimetable, 60000);
 
 
 // **Update Timetable Data**
