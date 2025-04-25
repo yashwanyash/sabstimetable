@@ -90,13 +90,30 @@
         });
     </script>
     <h2>Staff Suggestions</h2>
-    <input type="text" id="staff_name" placeholder="Enter Your Name" required>
+    <!-- Suggestion: Staff Name Buttons -->
+<div id="staff-buttons">
+    <button type="button" onclick="selectStaff('Aachana')">Aachana</button>
+    <button type="button" onclick="selectStaff('Akashatha')">Akashatha</button>
+    <button type="button" onclick="selectStaff('Raivatha')">Raivatha</button>
+    <!-- Add more if needed -->
+  </div>
+  
+  <!-- The actual input that gets auto-filled -->
+  
+  
+    <input type="text" id="staff_name" placeholder="Enter Your Name"  required>
     <br>
     <textarea id="suggestion" placeholder="Write your suggestion..."></textarea>
     <br>
     <button onclick="submitSuggestion()">Submit</button>
-
+<script>
+            function selectStaff(name) {
+              document.getElementById("staff_name").value = name;
+            }
+          </script>
+          
     <script>
+        
         function submitSuggestion() {
             const staffName = document.getElementById("staff_name").value;
             const message = document.getElementById("suggestion").value;
