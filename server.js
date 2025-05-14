@@ -168,6 +168,46 @@ app.get("/api/timetable/today", (req, res) => {
     });
 });
 
+// Route to get the full master timetable (all days) from master_timetable table
+app.get("/api/timetable/all", (req, res) => {
+    const sql = "SELECT * FROM master_timetable"; // Using correct table now
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("❌ Database error while fetching master timetable:", err);
+            res.status(500).json({ error: "Database query failed" });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+
+// Update Master Timetable
+app.put("/api/timetable", (req, res) => {
+    const updatedTimetable = req.body;
+
+    updatedTimetable.forEach(row => {
+        const { id, ...columns } = row;
+        const columnNames = Object.keys(columns);
+        const columnValues = Object.values(columns);
+
+        let query = `UPDATE master_timetable SET ${columnNames.map(col => `${col} = ?`).join(", ")} WHERE id = ?`;
+        let values = [...columnValues, id];
+
+        db.query(query, values, (err, result) => {
+            if (err) {
+                console.error("❌ Error updating master timetable:", err);
+                return res.status(500).json({ error: "Database update failed" });
+            }
+        });
+    });
+
+    res.json({ message: "✅ Master timetable updated successfully!" });
+});
+
+
+
 // ✅ Function to reset daily_timetable from master_timetable
 function resetDailyTimetable() {
     const today = new Date().toISOString().split("T")[0];

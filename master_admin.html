@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title >Master Timetable</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #141e30, #243b55);
+        margin-top: 25px;
+        justify-content: center;
+        align-items: center;
+    }
+    h1 {
+        color: #ddd;
+    }
+    h3 {
+        color: white; /* Added to make day headings white */
+    }
+    table {
+        width: 80%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+    th {
+        background-color: #007BFF;
+        color: white;
+    }
+    .back {
+        background-color: bisque;
+        color: black;
+        border-radius: 5px;
+        border: 1px solid black;
+        padding: 8px 15px;
+        font-size: 16px;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .back:hover {
+        background-color: #e6c7a5;
+    }
+    .btn {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .edit-btn { background: #f39c12; color: white; }
+        .save-btn { background: #28a745; color: white; }
+</style>
+
+</head>
+<body>
+    <a href="ttadmin.html" class="back"> Back</a><br><br><hr>
+    <center><h1 >Master Timetable</h1></center>
+    <div id="timetable-container"></div>
+    <center><button id="editButton" class="btn edit-btn">Edit</button>
+    <button id="saveButton" class="btn save-btn" disabled>Save</button></center>
+
+    
+    <script>
+    let globalColumns = [];
+
+    fetch("http://localhost:5004/api/timetable/all")
+        .then(response => response.json())
+        .then(data => {
+            if (data.length === 0) {
+                document.getElementById("timetable-container").innerHTML = "<p>No timetable data available.</p>";
+                return;
+            }
+
+            const groupedByDay = {};
+            data.forEach(entry => {
+                const day = entry.day;
+                if (!groupedByDay[day]) {
+                    groupedByDay[day] = [];
+                }
+                groupedByDay[day].push(entry);
+            });
+
+            const allRows = [];
+
+            for (const [day, entries] of Object.entries(groupedByDay)) {
+                const container = document.createElement("div");
+                container.innerHTML = `<center><h3 style="color: white;">${day}</h3></center>`;
+
+                const table = document.createElement("table");
+                const thead = document.createElement("thead");
+                const tbody = document.createElement("tbody");
+                tbody.id = "table-body"; // Single tbody to simplify saving
+
+                const headerRow = document.createElement("tr");
+                let columns = Object.keys(entries[0]);
+                globalColumns = columns; // Save for saving logic
+
+                columns.forEach(col => {
+                    const th = document.createElement("th");
+                    th.textContent = col.replace(/_/g, " ");
+                    if (col === "id") th.style.display = "none";
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                entries.forEach(row => {
+                    const tr = document.createElement("tr");
+                    columns.forEach(col => {
+                        const td = document.createElement("td");
+                        td.textContent = row[col];
+                        if (col === "id") td.style.display = "none";
+                        tr.appendChild(td);
+                    });
+                    allRows.push(tr);
+                    tbody.appendChild(tr);
+                });
+
+                table.appendChild(tbody);
+                container.appendChild(table);
+                document.getElementById("timetable-container").appendChild(container);
+            }
+
+            // Handle Edit
+            document.getElementById("editButton").addEventListener("click", () => {
+                allRows.forEach(row => {
+                    row.querySelectorAll("td").forEach(td => {
+                        td.setAttribute("contenteditable", "true");
+                    });
+                });
+                document.getElementById("editButton").disabled = true;
+                document.getElementById("saveButton").disabled = false;
+            });
+
+            // Handle Save
+            document.getElementById("saveButton").addEventListener("click", () => {
+                const updatedData = [];
+                allRows.forEach(row => {
+                    const rowData = {};
+                    const cells = row.querySelectorAll("td");
+                    cells.forEach((cell, i) => {
+                        rowData[globalColumns[i]] = cell.textContent.trim();
+                    });
+                    updatedData.push(rowData);
+                });
+
+                console.log("📤 Sending updated data:", updatedData);
+
+                fetch("https://sabstimetable.onrender.com/api/timetable",{
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(updatedData)
+                })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    allRows.forEach(row => {
+                        row.querySelectorAll("td").forEach(td => {
+                            td.setAttribute("contenteditable", "false");
+                        });
+                    });
+                    document.getElementById("editButton").disabled = false;
+                    document.getElementById("saveButton").disabled = true;
+                })
+                .catch(err => {
+                    console.error("❌ Error saving timetable:", err);
+                    alert("❌ Failed to save timetable.");
+                });
+            });
+
+        })
+        .catch(error => {
+            console.error("❌ Error fetching timetable:", error);
+            document.getElementById("timetable-container").innerHTML = "<p>Error loading timetable.</p>";
+        });
+</script>
+
+</body>
+</html>
