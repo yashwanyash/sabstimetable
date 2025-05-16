@@ -184,7 +184,7 @@ app.get("/api/timetable/all", (req, res) => {
 
 
 // Update Master Timetable
-app.put("/api/timetable", (req, res) => {
+/*app.put("/api/timetable", (req, res) => {
     const updatedTimetable = req.body;
 
     updatedTimetable.forEach(row => {
@@ -204,7 +204,7 @@ app.put("/api/timetable", (req, res) => {
     });
 
     res.json({ message: "✅ Master timetable updated successfully!" });
-});
+}); */
 
 
 
