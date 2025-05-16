@@ -168,6 +168,8 @@ app.get("/api/timetable/today", (req, res) => {
     });
 });
 
+
+
 // Route to get the full master timetable (all days) from master_timetable table
 app.get("/api/timetable/all", (req, res) => {
     const sql = "SELECT * FROM master_timetable"; // Using correct table now
