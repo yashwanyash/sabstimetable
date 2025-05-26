@@ -72,7 +72,7 @@
     <script>
     let globalColumns = [];
 
-    fetch("https://sabstimetable.onrender.com/api/timetable/all")
+    fetch("http://localhost:5004/api/timetable/all")
         .then(response => response.json())
         .then(data => {
             if (data.length === 0) {
@@ -155,7 +155,7 @@
 
                 console.log("📤 Sending updated data:", updatedData);
 
-                fetch("https://sabstimetable.onrender.com/api/timetable",{
+                fetch("http://localhost:5004/api/timetable",{
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json"

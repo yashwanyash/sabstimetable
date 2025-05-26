@@ -51,7 +51,7 @@
             const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
             document.getElementById("current-day").textContent = currentDay; // Display current day
 
-            fetch("https://sabstimetable.onrender.com/api/timetable/today")
+            fetch("http://localhost:5004/api/timetable/today")
             // Fetch today's timetable
                 .then(response => response.json())
                 .then(data => {
@@ -124,7 +124,7 @@
                 return;
             }
 
-            fetch("https://sabstimetable.onrender.com/api/suggestions", {
+            fetch("http://localhost:5004/api/suggestions", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ staff_name: staffName, message })

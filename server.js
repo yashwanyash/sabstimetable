@@ -10,12 +10,13 @@ app.use(cors());
 app.use(express.json()); // Allows Express to handle JSON requests
 
 // MySQL Connection
-/*const db = mysql.createConnection({
+const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Yashwan@135790",
     database: "CollegeTimetable"
-});*/
+});
+/*
 const db = mysql.createConnection({
     host: "hopper.proxy.rlwy.net",   // Public MySQL Host from Railway
     port: 26036,                      // Correct Port from Railway
@@ -23,6 +24,7 @@ const db = mysql.createConnection({
     password: "NFgBQAasPKmFSqJEiPOkKvdnOMVsMMGo",   // Copy from Railway MYSQLPASSWORD
     database: "railway"     // Copy from Railway MYSQLDATABASE
 });
+*/
 db.connect(err => {
     if (err) {
         console.error("❌ Database connection failed:", err);
@@ -31,6 +33,7 @@ db.connect(err => {
     }
 });
 
+//Staff login
 app.post("/api/staff-login", (req, res) => {
     const { passcode } = req.body;
 
@@ -49,7 +52,7 @@ app.post("/api/staff-login", (req, res) => {
     });
 });
 
-
+//Admin login 
 app.post("/api/admin-login", (req, res) => {
     const { passcode } = req.body;
 

@@ -108,7 +108,7 @@
         
             const passcode = document.getElementById("passcode").value;
         
-            fetch("https://sabstimetable.onrender.com/api/staff-login", {
+            fetch("http://localhost:5004/api/staff-login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ passcode })

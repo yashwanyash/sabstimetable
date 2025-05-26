@@ -64,7 +64,9 @@
             const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
             document.getElementById("current-day").textContent = currentDay; // Display current day
 
-            fetch("https://sabstimetable.onrender.com/api/timetable/today")                .then(response => response.json())
+            /*fetch("https://sabstimetable.onrender.com/api/timetable/today") */
+              fetch("http://localhost:5004/api/timetable/today")
+                .then(response => response.json())
                 .then(data => {
                     if (data.length === 0) {
                         document.body.innerHTML += "<p>No timetable available for today.</p>";
@@ -124,7 +126,7 @@
                         console.log("🔍 Sending Data:", JSON.stringify(updatedData, null, 2)); // Debug
                         
                         // Send updated data to the server
-                         fetch("https://sabstimetable.onrender.com/api/timetable", {
+                         fetch("http://localhost:5004/api/timetable", {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(updatedData)
@@ -164,7 +166,7 @@
            
         
         function fetchSuggestions() {
-            fetch("https://sabstimetable.onrender.com/api/suggestions")
+            fetch("http://localhost:5004/api/suggestions")
 
                 .then(response => response.json())
                 .then(data => {
