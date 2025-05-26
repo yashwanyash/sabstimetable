@@ -18,10 +18,10 @@ app.use(express.json()); // Allows Express to handle JSON requests
 });
 */
 const db = mysql.createConnection({
-    host: "hopper.proxy.rlwy.net",   // Public MySQL Host from Railway
-    port: 26036,                      // Correct Port from Railway
+    host: "metro.proxy.rlwy.net",   // Public MySQL Host from Railway
+    port: 22645,                      // Correct Port from Railway
     user: "root",                     // Your MySQL user (root)
-    password: "NFgBQAasPKmFSqJEiPOkKvdnOMVsMMGo",   // Copy from Railway MYSQLPASSWORD
+    password: "fVzhRHoMYqAyIRMIwSbkDztAJraXtsVM",   // Copy from Railway MYSQLPASSWORD
     database: "railway"     // Copy from Railway MYSQLDATABASE
 });
 
